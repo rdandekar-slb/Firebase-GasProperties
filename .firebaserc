@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "rrd-fb-test-d6bfb",
+    "staging": "rrd-fb-test-d6bfb"
+  }
+}
