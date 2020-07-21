@@ -1,36 +1,42 @@
-function main()
-{
-    document.getElementById("gas-properties").innerHTML="";
+function main() {
+    document.getElementById("gas-properties").innerHTML = "";
     input = getparams();
-    if (input.spgr=="" || input.pres=="" || input.temp=="")
-    {
+    if (input.spgr == "" || input.pres == "" || input.temp == "") {
         //alert("Please check data");
         setTimeout(() => {
-            document.getElementById("gas-properties").innerHTML="";
+            document.getElementById("gas-properties").innerHTML = "";
         }, 1000);
-        document.getElementById("gas-properties").innerHTML="<h3>Please check data</h3>";
+        document.getElementById("gas-properties").innerHTML = "<h3>Please check data</h3>";
 
         return;
     }
-    gasprops=getgasproperties(input);
-    strGasProps=JSON.stringify(gasprops);
-    document.getElementById("gas-properties").innerHTML=strGasProps;
+    gasprops = getgasproperties(input);
+    strGasProps = JSON.stringify(gasprops);
+    document.getElementById("gas-properties").innerHTML = strGasProps;
 }
-function getparams()
-{
-    spgr=document.getElementById("spgr").value;
+
+function getparams() {
+    spgr = document.getElementById("spgr").value;
     //alert(spgr);
-    pres=document.getElementById("pres").value;
-    temp=document.getElementById("temp").value;
-    var inputObj = {spgr:spgr, pres:pres, temp:temp};
+    pres = document.getElementById("pres").value;
+    temp = document.getElementById("temp").value;
+    h2s = document.getElementById("h2s").value;
+    co2 = document.getElementById("co2").value;
+    var inputObj = {
+        spgr: spgr,
+        pres: pres,
+        temp: temp,
+        h2s: h2s,
+        co2: co2
+    };
     return inputObj;
 }
-function getgasproperties(inp)
-{
-    h2s = inp.h2s ? inp.h2s : 0.00;
-    co2 = inp.co2 ? inp.co2 : 0.00;
-    var pres=Number(inp.pres);
-    var temp=Number(inp.temp);
+
+function getgasproperties(inp) {
+    h2s = inp.h2s ? parseFloat(inp.h2s) : 0.00;
+    co2 = inp.co2 ? parseFloat(inp.co2) : 0.00;
+    var pres = parseFloat(inp.pres);
+    var temp = parseFloat(inp.temp);
     var spgr = parseFloat(inp.spgr);
 
 
@@ -47,8 +53,8 @@ function getgasproperties(inp)
     a10 = 0.6134;
     a11 = 0.721;
 
-    epsilon = (120.0 * (Math.pow((h2s + co2),0.9) - Math.pow((h2s + co2),1.6)));
-    epsilon += (15.0 * (Math.pow(h2s,0.5) - Math.pow(h2s,4)));
+    epsilon = (120.0 * (Math.pow((h2s + co2), 0.9) - Math.pow((h2s + co2), 1.6)));
+    epsilon += (15.0 * (Math.pow(h2s, 0.5) - Math.pow(h2s, 4)));
     ppc = 756.8 - (131.0 * spgr) - (3.6 * spgr * spgr);
     tpc = 169.2 + (349.5 * spgr) - (74.0 * spgr * spgr);
 
@@ -61,39 +67,40 @@ function getgasproperties(inp)
 
     z_temp = 1.0;
 
-    while (true)
-    {
-        rhopr=0.27*(ppr/(z_temp*tpr));
-        c1=a1+(a2/tpr)+(a3/tpr**3)+(a4/tpr**4)+(a5/tpr**5);
-        c2=a6+(a7/tpr)+(a8/tpr**2);
-        c3=a9*((a7/tpr)+(a8/tpr**2));
-        c4=a10*(1+a11*rhopr**2)*((rhopr**2/tpr**3)*Math.exp(-a11*rhopr**2));
+    while (true) {
+        rhopr = 0.27 * (ppr / (z_temp * tpr));
+        c1 = a1 + (a2 / tpr) + (a3 / tpr ** 3) + (a4 / tpr ** 4) + (a5 / tpr ** 5);
+        c2 = a6 + (a7 / tpr) + (a8 / tpr ** 2);
+        c3 = a9 * ((a7 / tpr) + (a8 / tpr ** 2));
+        c4 = a10 * (1 + a11 * rhopr ** 2) * ((rhopr ** 2 / tpr ** 3) * Math.exp(-a11 * rhopr ** 2));
 
-        fz=z_temp - (1+ c1*rhopr + c2*rhopr**2 - c3*rhopr**5 + c4);
-        dfz= 1 + (c1*rhopr/z_temp) + (2*c2*rhopr**2/z_temp) - (5*c3*rhopr**5/z_temp)+ (2 * (a10*rhopr**2) * ((1 + a11*rhopr**2-(a11*rhopr**2)**2) / (tpr**3 * z_temp)) * Math.exp(-a11 * rhopr ** 2));
-        z_new = z_temp - fz/dfz;
-        if (Math.abs(z_new - z_temp) < 1e-6) 
-        {
+        fz = z_temp - (1 + c1 * rhopr + c2 * rhopr ** 2 - c3 * rhopr ** 5 + c4);
+        dfz = 1 + (c1 * rhopr / z_temp) + (2 * c2 * rhopr ** 2 / z_temp) - (5 * c3 * rhopr ** 5 / z_temp) + (2 * (a10 * rhopr ** 2) * ((1 + a11 * rhopr ** 2 - (a11 * rhopr ** 2) ** 2) / (tpr ** 3 * z_temp)) * Math.exp(-a11 * rhopr ** 2));
+        z_new = z_temp - fz / dfz;
+        if (Math.abs(z_new - z_temp) < 1e-6) {
             break;
 
-        }
-        else
-        {
+        } else {
             z_temp = z_new;
         }
-        
-    }    
+
+    }
     zfact = z_new;
-    b_g = 0.02827*zfact*(temp+459.67)/pres;
-    rho_g = 0.0433 * spgr * pres / (zfact * (temp+459.67));
-    x = 3.448 + (986.4/(temp+459.67)) + 0.01009*spgr*28.9586;
-    y = 2.4 - 0.2*x;
-    k = (9.379 + 0.0160 * 28.9586 * spgr) * ((temp+459.67)**1.5);
-    k /= 209.2 + 19.26*28.9586*spgr + (temp+459.67);
-    mu_g = k * 0.0001 * Math.exp(x * (rho_g**y));
+    b_g = 0.02827 * zfact * (temp + 459.67) / pres;
+    rho_g = 0.0433 * spgr * pres / (zfact * (temp + 459.67));
+    x = 3.448 + (986.4 / (temp + 459.67)) + 0.01009 * spgr * 28.9586;
+    y = 2.4 - 0.2 * x;
+    k = (9.379 + 0.0160 * 28.9586 * spgr) * ((temp + 459.67) ** 1.5);
+    k /= 209.2 + 19.26 * 28.9586 * spgr + (temp + 459.67);
+    mu_g = k * 0.0001 * Math.exp(x * (rho_g ** y));
     rho_g *= 62.428;
 
-    gasprops = {gaszfactor:zfact, gasformationvolumefactor:b_g, gasdensity:rho_g, gasviscosity:mu_g};
+    gasprops = {
+        gaszfactor: zfact,
+        gasformationvolumefactor: b_g,
+        gasdensity: rho_g,
+        gasviscosity: mu_g
+    };
 
     return gasprops;
 }
