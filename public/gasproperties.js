@@ -4,7 +4,12 @@ function main()
     input = getparams();
     if (input.spgr=="" || input.pres=="" || input.temp=="")
     {
-        alert("Please check data");
+        //alert("Please check data");
+        setTimeout(() => {
+            document.getElementById("gas-properties").innerHTML="";
+        }, 1000);
+        document.getElementById("gas-properties").innerHTML="<h3>Please check data</h3>";
+
         return;
     }
     gasprops=getgasproperties(input);
