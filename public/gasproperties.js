@@ -1,5 +1,5 @@
 function main() {
-    document.getElementById("gas-properties").innerHTML = "";
+    // document.getElementById("gas-properties").innerHTML = "";
     input = getparams();
     if (input.spgr == "" || input.pres == "" || input.temp == "") {
         //alert("Please check data");
@@ -12,10 +12,11 @@ function main() {
     }
     gasprops = getgasproperties(input);
     strGasProps = JSON.stringify(gasprops);
-    document.getElementById("gaszfactor").innerHTML = gasprops.gaszfactor;
-    document.getElementById("bgfactor").innerHTML = gasprops.gasformationvolumefactor;
-    document.getElementById("gasdensity").innerHTML = gasprops.gasdensity;
-    document.getElementById("gasviscosity").innerHTML = gasprops.gasviscosity;
+
+    document.getElementById("zfac").textContent = gasprops.gaszfactor;
+    document.getElementById("b_g").textContent = gasprops.gasformationvolumefactor;
+    document.getElementById("rho_g").textContent = gasprops.gasdensity;
+    document.getElementById("mu_g").textContent = gasprops.gasviscosity;
 }
 
 function getparams() {
