@@ -12,7 +12,10 @@ function main() {
     }
     gasprops = getgasproperties(input);
     strGasProps = JSON.stringify(gasprops);
-    document.getElementById("gas-properties").innerHTML = strGasProps;
+    document.getElementById("gaszfactor").innerHTML = gasprops.gaszfactor;
+    document.getElementById("bgfactor").innerHTML = gasprops.gasformationvolumefactor;
+    document.getElementById("gasdensity").innerHTML = gasprops.gasdensity;
+    document.getElementById("gasviscosity").innerHTML = gasprops.gasviscosity;
 }
 
 function getparams() {
